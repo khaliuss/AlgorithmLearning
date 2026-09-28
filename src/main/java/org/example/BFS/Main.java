@@ -7,6 +7,7 @@ import org.example.BFS.entities.Rock;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
 
 public class Main {
 
@@ -25,20 +26,22 @@ public class Main {
         map.putEntity(rockCoordinate,new Rock());
         map.putEntity(rockCoordinate2,new Rock());
 
-        FindPath findPath = new FindPath(map,rabbitCoordinate,carrotCoordinate);
-        List<Coordinates> paths = findPath.path();
+        FindPath findPath = new FindPath(map,rabbitCoordinate,Arrays.asList(carrotCoordinate,carrotCoordinate2));
+        List<Coordinates> paths = findPath.path().reversed();
 
-        for (Coordinates path : paths){
-            map.putEntity(path,new Rabbit());
+        System.out.println(paths);
+        for (int i =0;i<paths.size();i++ ){
             renderer.render(map);
             try {
-                Thread.sleep(2000L);
+                Thread.sleep(1000L);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
             System.out.println();
 
-            map.deleteEntity(path);
+            map.deleteEntity(paths.get(i));
+            if (i >= paths.size()-1) continue;
+            map.putEntity(paths.get(i+1),new Rabbit());
             clearConsole();
 
         }

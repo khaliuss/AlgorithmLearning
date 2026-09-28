@@ -9,16 +9,16 @@ public class FindPath {
     private int GRID_ROW = 5;
     private int GRID_COL = 8;
     private Coordinates startPoint;
-    private Coordinates targetCoordinate;
+    private List<Coordinates> targetCoordinates;
     private Map map;
 
 
     Queue<Coordinates> queue = new LinkedList<>();
     HashMap<Coordinates, Coordinates> visited = new HashMap<>();
 
-    public FindPath(Map map, Coordinates startPoint, Coordinates targetCoordinate) {
+    public FindPath(Map map, Coordinates startPoint, List<Coordinates> targetCoordinates) {
         this.startPoint = startPoint;
-        this.targetCoordinate = targetCoordinate;
+        this.targetCoordinates = targetCoordinates;
         this.map = map;
     }
 
@@ -38,42 +38,50 @@ public class FindPath {
                     queue.add(coordinate);
                     visited.put(coordinate, cameFrom);
                 }
-
-
             }
         }
     }
 
-    public List<Coordinates> path() {
+    private List<Coordinates> findFood() {
         queue.add(startPoint);
         visited.put(startPoint, null);
-        List<Coordinates> neighbors = new ArrayList<>();
+        List<Coordinates> foundedFood = new ArrayList<>();
 
         while (!queue.isEmpty()) {
             Coordinates checkCoordinate = queue.poll();
-            if (checkCoordinate.equals(targetCoordinate)) {
-                neighbors.add(checkCoordinate);
-                Coordinates neighborKey = checkCoordinate;
-
-                while (true) {
-                    if (visited.containsKey(neighborKey)) {
-                        Coordinates neighbor = visited.get(neighborKey);
-                        if (neighbor == null) {
-                            Collections.reverse(neighbors);
-                            return neighbors;
-                        }
-                        neighbors.add(neighbor);
-                        neighborKey = neighbor;
-                    } else {
-                        return neighbors;
-                    }
-                }
+            if (targetCoordinates.contains(checkCoordinate)) {
+                foundedFood.add(checkCoordinate);
             } else {
                 findAvailable(checkCoordinate);
             }
+        }
+
+        return foundedFood;
+    }
+
+    public List<Coordinates> path() {
+        List<Coordinates> foodCoordinates = findFood();
+        List<Coordinates> neighbors = new ArrayList<>();
+        for (Coordinates food : foodCoordinates) {
+            Coordinates neighborKey = food;
+            neighbors.add(food);
+            while (true) {
+                Coordinates neighbor = visited.get(neighborKey);
+                if (neighbor == null) {
+                    break;
+                }
+                neighbors.add(neighbor);
+                neighborKey = neighbor;
+            }
+            // Добавить сюда реализацию того как заец строит путь из поседнего места
+            // Я Думаю это можно реализовать даже чуть в другом месте
+            // Когда получили список точек с марковкой ->
+            // сделать создание нового пути может с помощью метода findAvailable
+            // надо еще подумать
         }
         return neighbors;
     }
 
 
 }
+

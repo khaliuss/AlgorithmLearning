@@ -25,4 +25,8 @@ public class Map {
     public boolean isEmpty(Coordinates coordinates){
         return !entities.containsKey(coordinates);
     }
+
+    public boolean isFoodExist() {
+        return entities.containsValue(new Rabbit());
+    }
 }
