@@ -26,29 +26,10 @@ public class Main {
         map.putEntity(rockCoordinate,new Rock());
         map.putEntity(rockCoordinate2,new Rock());
 
-        FindPath findPath = new FindPath(map,rabbitCoordinate,Arrays.asList(carrotCoordinate,carrotCoordinate2));
-        List<Coordinates> paths = findPath.path().reversed();
+        FindPath findPath = new FindPath(map,rabbitCoordinate,Arrays.asList(carrotCoordinate,carrotCoordinate2),new Renderer());
+        findPath.findFood();
 
-        System.out.println(paths);
-        for (int i =0;i<paths.size();i++ ){
-            renderer.render(map);
-            try {
-                Thread.sleep(1000L);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            System.out.println();
-
-            map.deleteEntity(paths.get(i));
-            if (i >= paths.size()-1) continue;
-            map.putEntity(paths.get(i+1),new Rabbit());
-            clearConsole();
-
-        }
     }
 
-    private static void clearConsole() {
-        System.out.println("\033[H\033[2J");
-        System.out.flush();
-    }
+
 }

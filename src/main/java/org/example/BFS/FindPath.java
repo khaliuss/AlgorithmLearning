@@ -1,5 +1,8 @@
 package org.example.BFS;
 
+import org.example.BFS.entities.Carrot;
+import org.example.BFS.entities.Rabbit;
+import org.example.BFS.entities.Renderer;
 import org.example.BFS.entities.Rock;
 
 import java.util.*;
@@ -11,15 +14,17 @@ public class FindPath {
     private Coordinates startPoint;
     private List<Coordinates> targetCoordinates;
     private Map map;
+    private Renderer renderer;
 
 
     Queue<Coordinates> queue = new LinkedList<>();
     HashMap<Coordinates, Coordinates> visited = new HashMap<>();
 
-    public FindPath(Map map, Coordinates startPoint, List<Coordinates> targetCoordinates) {
+    public FindPath(Map map, Coordinates startPoint, List<Coordinates> targetCoordinates,Renderer renderer) {
         this.startPoint = startPoint;
         this.targetCoordinates = targetCoordinates;
         this.map = map;
+        this.renderer = renderer;
     }
 
     int[] dRow = new int[]{0, -1, -1, -1, 0, +1, +1, +1};
@@ -42,46 +47,60 @@ public class FindPath {
         }
     }
 
-    private List<Coordinates> findFood() {
+    public void findFood() {
         queue.add(startPoint);
         visited.put(startPoint, null);
-        List<Coordinates> foundedFood = new ArrayList<>();
 
-        while (!queue.isEmpty()) {
+        while (map.isFoodExist(Carrot.class)) {
             Coordinates checkCoordinate = queue.poll();
-            if (targetCoordinates.contains(checkCoordinate)) {
-                foundedFood.add(checkCoordinate);
-            } else {
-                findAvailable(checkCoordinate);
-            }
-        }
-
-        return foundedFood;
-    }
-
-    public List<Coordinates> path() {
-        List<Coordinates> foodCoordinates = findFood();
-        List<Coordinates> neighbors = new ArrayList<>();
-        for (Coordinates food : foodCoordinates) {
-            Coordinates neighborKey = food;
-            neighbors.add(food);
-            while (true) {
-                Coordinates neighbor = visited.get(neighborKey);
-                if (neighbor == null) {
-                    break;
+            if (map.getEntity(checkCoordinate) instanceof Carrot){
+                List<Coordinates> neighbors = new ArrayList<>();
+                Coordinates neighborKey = checkCoordinate;
+                neighbors.add(neighborKey);
+                while (true) {
+                    Coordinates neighbor = visited.get(neighborKey);
+                    if (neighbor == null) {
+                        break;
+                    }
+                    neighbors.add(neighbor);
+                    neighborKey = neighbor;
                 }
-                neighbors.add(neighbor);
-                neighborKey = neighbor;
+                Collections.reverse(neighbors);
+
+                //Render
+                for (int i = 0; i < neighbors.size(); i++) {
+                    clearConsole();
+                    renderer.render(map);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    if (i >= neighbors.size() - 1) continue;
+                    map.deleteEntity(neighbors.get(i));
+                    map.putEntity(neighbors.get(i + 1), new Rabbit());
+                    clearConsole();
+                }
+                startPoint = neighbors.getLast();
+                queue.clear();
+                visited.clear();
+                queue.add(startPoint);
+                visited.put(startPoint, null);
+
+            } else {
+                if (checkCoordinate != null) {
+                    findAvailable(checkCoordinate);
+                }
             }
-            // Добавить сюда реализацию того как заец строит путь из поседнего места
-            // Я Думаю это можно реализовать даже чуть в другом месте
-            // Когда получили список точек с марковкой ->
-            // сделать создание нового пути может с помощью метода findAvailable
-            // надо еще подумать
         }
-        return neighbors;
+
+
     }
 
-
+    private static void clearConsole() {
+        System.out.println("\033[H\033[2J");
+        System.out.flush();
+    }
 }
 

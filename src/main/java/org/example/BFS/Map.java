@@ -26,7 +26,14 @@ public class Map {
         return !entities.containsKey(coordinates);
     }
 
-    public boolean isFoodExist() {
-        return entities.containsValue(new Rabbit());
+
+    public boolean isFoodExist(Class<? extends Entity> type) {
+        boolean exist = false;
+        for (Entity entity : entities.values()){
+            if (type.isInstance(entity)) {
+                return true;
+            }
+        }
+        return exist;
     }
 }
