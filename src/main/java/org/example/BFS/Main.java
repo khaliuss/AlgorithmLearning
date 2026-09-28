@@ -5,29 +5,27 @@ import org.example.BFS.entities.Rabbit;
 import org.example.BFS.entities.Renderer;
 import org.example.BFS.entities.Rock;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Queue;
+import java.util.Random;
 
 public class Main {
 
-    public static void main(String[] args){
-        Map map = new Map();
+    public static void main(String[] args) {
+        GameMap gameMap = new GameMap();
         Renderer renderer = new Renderer();
-        Coordinates rabbitCoordinate = new Coordinates(4,1);
-        Coordinates carrotCoordinate = new Coordinates(1,6);
-        Coordinates carrotCoordinate2 = new Coordinates(0,0);
-        Coordinates rockCoordinate = new Coordinates(1,5);
-        Coordinates rockCoordinate2 = new Coordinates(2,5);
 
-        map.putEntity(rabbitCoordinate,new Rabbit());
-        map.putEntity(carrotCoordinate,new Carrot());
-        map.putEntity(carrotCoordinate2,new Carrot());
-        map.putEntity(rockCoordinate,new Rock());
-        map.putEntity(rockCoordinate2,new Rock());
+        RandomInit randomInit = new RandomInit(gameMap);
+        randomInit.create(new Carrot());
 
-        FindPath findPath = new FindPath(map,rabbitCoordinate,Arrays.asList(carrotCoordinate,carrotCoordinate2),new Renderer());
-        findPath.findFood();
+        Coordinate rabbitCoordinate = new Coordinate(5, 1);
+        Coordinate rockCoordinate = new Coordinate(1, 5);
+        Coordinate rockCoordinate2 = new Coordinate(2, 5);
+
+        gameMap.putEntity(rabbitCoordinate, new Rabbit());
+        gameMap.putEntity(rockCoordinate, new Rock());
+        gameMap.putEntity(rockCoordinate2, new Rock());
+
+        PathFinder pathFinder = new PathFinder(gameMap, rabbitCoordinate, renderer);
+        pathFinder.huntTargets(new Carrot());
 
     }
 
